@@ -1,6 +1,7 @@
 var conexion=require('./conexion').conexionUsuarios;
 var Usuario=require('../modelos/usuarios');
-
+var {generarPassword, validarPassword} = require("../middlewares/passwords");    
+const { log } = require("console");
 //var fs = require("fs");
 //fs.unlinkSync("")
 
@@ -24,10 +25,13 @@ async function mostrarUsuarios(){
     return users; 
 }
 
-async function nuevoUsuario(newUser){
+async function nuevoUsuario(datos){
     var error=1;
+    var {salt,hash} = generarPassword(datos.password);
+    datos.salt=salt;
+    datos.password=hash;
     try{
-        var usuario1 = new Usuario(null,newUser);
+        var usuario1 = new Usuario(null,datos);
         if(usuario1.bandera==0){
             conexion.doc().set(usuario1.obtenerUsuario);
             error=0;
@@ -39,12 +43,36 @@ async function nuevoUsuario(newUser){
     }
     return error;
 }
- 
+
+
+async function login(datos){
+    var user;
+    var usuarioBd = await conexion.where("usuario","==",datos.usuario).get();
+    if(usuarioBd.empty){
+        console.log("usuario no existe");
+        return user;
+    }else{
+        usuarioBd.forEach((doc) => {
+            var validP = validarPassword(datos.password,doc.data().salt,doc.data().password);
+            if(validP===false){
+                console.log("PASSWORD INCORRECTO");
+                user=0; //return user;
+            }else{
+                console.log("SI SE VALIDO")
+                user=1;
+            }
+        });
+    }
+    return user;
+}
+
+
 
 async function buscarPorId(id){ //error al concatenar al usuario: Error: Value for argument "documentPath" is not a valid resource path. Path must be a non-empty string.
     var user;
     try{
         var usuarioBD = await conexion.doc(id).get();
+        //var usuarioBD = await conexion.where("usuario","==",datos.usuario).get(); 
         var usuarioObjeto= new Usuario(usuarioBD.id,usuarioBD.data());
         if(usuarioObjeto.bandera==0){
             user=usuarioObjeto.obtenerUsuario;
@@ -61,6 +89,13 @@ async function modificarUsuario(datos){
     var error=1;
     var user = await buscarPorId(datos.id); 
     if(user!=undefined){
+        if(datos.password===""){
+            datos.password===datos.passwordAnt;
+        }else{
+            var {salt,hash} = generarPassword(datos.password);
+            datos.salt=salt;
+            datos.password=hash;
+        }
         var user = new Usuario(datos.id,datos);
         if(user.bandera===0){
             try{    
@@ -101,5 +136,6 @@ module.exports={
     nuevoUsuario,
     buscarPorId,
     modificarUsuario,
-    borrarUsuario
+    borrarUsuario,
+    login
 }

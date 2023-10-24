@@ -9,8 +9,10 @@
             <div class="card-body">
                 <!--<input type="text" name="id" id="id" value="<%=user.id%>" disabled> -->
                 <input type="hidden" name="id" id="id" value="<%= user.id %>">
+                <input type="hidden" name="passwordAnt" id="passwordAnt" value="<%= user.password %>">
+                <input type="hidden" name="salt" id="salt" value="<%= user.salt %>">
                 <input class="form-control mb-3" value="<%=user.nombre%>" type="text" name="nombre" id="nombre" placeholder="Nombre" autofocus>
-                <input class="form-control mb-3" value="<%=user.password%>" type="password" name="password" id="password" placeholder="Password" >
+                <input class="form-control mb-3" value="" type="password" name="password" id="password" placeholder="Ingrese password si desea reemplazar" >
                 <input class="form-control mb-3" value="<%=user.usuario%>" type="text" name="usuario" id="usuario" placeholder="Usuario">
                 <input class="form-control mb-3" type="file" name="foto" id="foto">
 
