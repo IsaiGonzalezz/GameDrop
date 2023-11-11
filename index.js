@@ -7,7 +7,9 @@ var rutasUsuarios = require("./rutas/usuariosRutas");
 var rutasProductos = require("./rutas/productosRutas");
 var rutasUsuariosApis = require ("./rutas/usuariosRutasApis");
 var rutasProductosApis = require ("./rutas/productosRutasApis");
- 
+
+require("dotenv").config();
+
 var app=express();
 app.set("view engine","ejs");
 app.use(cors());
@@ -16,12 +18,20 @@ app.use(express.urlencoded({extended:true}));
 app.use("/",express.static(path.join(__dirname,'/public')));
 app.use("/",express.static(path.join(__dirname,'/web')));
 
-app.use(session({
+/*app.use(session({
     name: "session",
     keys: ["meAmckeGcneE"],
     maxAge: 24 * 60 * 60 * 1000,
 
+}))*/
+
+app.use(session({
+    secret:process.env.SESSION_SECRETO,
+    reseave: true,
+    saveUninitialized:true
 }))
+
+
 app.use("/",rutasUsuarios);
 app.use("/",rutasProductos);
 app.use("/",rutasUsuariosApis);
