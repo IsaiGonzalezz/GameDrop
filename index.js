@@ -3,12 +3,14 @@ var path = require("path");
 var cors = require ("cors");
 var session = require("cookie-session");
 
+require("dotenv").config();
+
 var rutasUsuarios = require("./rutas/usuariosRutas");
 var rutasProductos = require("./rutas/productosRutas");
 var rutasUsuariosApis = require ("./rutas/usuariosRutasApis");
 var rutasProductosApis = require ("./rutas/productosRutasApis");
 
-require("dotenv").config();
+
 
 var app=express();
 app.set("view engine","ejs");
