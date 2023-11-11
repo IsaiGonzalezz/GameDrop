@@ -30,6 +30,7 @@ async function nuevoUsuario(datos){
     var {salt,hash} = generarPassword(datos.password);
     datos.salt=salt;
     datos.password=hash;
+    datos.admin=false;
     try{
         var usuario1 = new Usuario(null,datos);
         if(usuario1.bandera==0){
@@ -89,6 +90,7 @@ async function modificarUsuario(datos){
     var error=1;
     var user = await buscarPorId(datos.id); 
     if(user!=undefined){
+        datos.admin=false;
         if(datos.password===""){
             datos.password===datos.passwordAnt;
         }else{

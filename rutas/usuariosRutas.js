@@ -1,5 +1,6 @@
 var ruta=require("express").Router();
 var subirArchivo=require("../middlewares/middlewares").subirArchivo;
+var {usuario, admin} = require("../middlewares/passwords")
 var fs = require("fs");
 var path = require("path");
 const { log } = require("console");
@@ -7,7 +8,7 @@ var {mostrarUsuarios, nuevoUsuario, buscarPorId, modificarUsuario,borrarUsuario,
 //const { log } = require("console");
 
 //login //////////////////////////////////////////////
-ruta.get("/", (req,res)=>{
+ruta.get("/login", (req,res)=>{
     
     res.render("usuario/login");
 });
@@ -15,7 +16,14 @@ ruta.get("/", (req,res)=>{
 ruta.post("/login", async(req,res)=>{
     var user = await login(req.body);
     if(user === 1){
-        res.redirect("/mostrarUsuario");
+        if(user.admin){
+            req.session.admin=req.body.usuario;
+            res.redirect("/");
+        }else{
+            req.session.usuario=req.body.usuario;
+            res.redirect("/");
+        }
+        
     }else if(user === 0){
         res.status(400).send({ error: "Contraseña no valida" });
     }else if(user === undefined){
@@ -24,11 +32,16 @@ ruta.post("/login", async(req,res)=>{
 });
 //login //////////////////////////////////////////////
 
+//logout//-//-/-/-/-/-/-/-/-/-
+ruta.get("/logout",(req,res)=>{    
+    req.session=null;
+    res.redirect("/");
+});
 
 //mostrar usuario //////////////////////////////////////////////
-ruta.get("/mostrarUsuario",async(req,res)=>{
+ruta.get("/",usuario,async(req,res)=>{
     var users = await mostrarUsuarios();
-    res.render("usuario/mostrar",{users})
+    res.render("usuario/principal",{users})
 });
 //////////////////////////////////////////////
 
@@ -42,7 +55,7 @@ ruta.get("/nuevoUsuario",(req,res)=>{
 ruta.post("/nuevoUsuario",subirArchivo(),async(req,res)=>{
     req.body.foto=req.file.originalname;
     var error = await nuevoUsuario(req.body);
-    res.redirect("/mostrarUsuario");
+    res.redirect("/login");
    
 })
 //nuevo usuario //////////////////////////////////////////////
@@ -65,7 +78,7 @@ ruta.post("/editarUsuario", subirArchivo(),async (req,res)=>{
     res.redirect("/mostrarUsuario");
 
 });
-//editar usuario //////////////////////////////////////////////
+//editar usuario ///-/-/-/-/--/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
 
 
 
@@ -82,7 +95,7 @@ ruta.get("/borrarUsuario/:id",async(req,res)=>{
             }
             await borrarUsuario(req.params.id);
         }
-        res.redirect("/mostrarUsuario");
+        res.redirect("/");
     }catch(error){
         console.log("Error al borrar usuario: "+error);
     }

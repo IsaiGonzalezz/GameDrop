@@ -1,5 +1,6 @@
 var ruta=require("express").Router();
 var subirArchivo=require("../middlewares/middlewares").subirArchivo;
+var {usuario, admin} = require("../middlewares/passwords");
 var fs = require("fs");
 const path = require("path");
 var {borrarProducto,buscarPorId,modificarProducto,mostrarProductos,nuevoProducto}=require("../bd/productosBD");
@@ -11,7 +12,7 @@ ruta.get("/mostrarProductos",async(req,res)=>{ // /////////////////
     res.render("productos/mostrar",{products})
 }); 
 
-ruta.get("/nuevoProducto",(req,res)=>{
+ruta.get("/nuevoProducto",admin,async(req,res)=>{
     res.render("productos/nuevo");
 }); 
 
