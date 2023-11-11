@@ -18,18 +18,13 @@ app.use(express.urlencoded({extended:true}));
 app.use("/",express.static(path.join(__dirname,'/public')));
 app.use("/",express.static(path.join(__dirname,'/web')));
 
-/*app.use(session({
-    name: "session",
-    keys: ["meAmckeGcneE"],
-    maxAge: 24 * 60 * 60 * 1000,
-
-}))*/
-
 app.use(session({
-    secret:process.env.SESSION_SECRETO,
-    reseave: true,
-    saveUninitialized:true
+    name:  process.env.SESSION_NAME,
+    keys:  [process.env.SESSION_KEYS],
+    maxAge: process.env.SESSION_MAX_AGE,
+
 }))
+
 
 
 app.use("/",rutasUsuarios);
